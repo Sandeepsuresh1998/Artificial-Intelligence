@@ -1,4 +1,6 @@
 #include "ClueReasoner.h"
+#include <cstring> to sat_solver.cpp
+#include <stdlib.h> to zchaff_dbase.cpp
 using namespace std;
 
 int ClueReasoner::GetPlayerNum(string player)

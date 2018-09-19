@@ -213,28 +213,28 @@ void ClueReasoner::Hand(string player, string cards[3])
 	// Also note that, player_num (not to be confused with num_players) is a private variable of 
 	// the ClueReasoner class that is initialized when this function is called.
 	player_num = GetPlayerNum(player);
-	
 	// TO BE IMPLEMENTED AS AN EXERCISE
 
 	// Now that we know the player_number we can adding clauses
-	for (int i = 0; i < cards->size(); i++) 
+	for (int c = 0; c < 3; c++) 
 	{
 		Clause clause;
 		//My player has the card, so no one else can
-		clause.push_back(GetPairNum(player_num, GetCardNum(cards[i])));
+		clause.push_back(GetPairNum(player_num, GetCardNum(cards[c])));
 
 		//My card cannot be in the case file
-		clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(cards[i])) * -1);
-		for (int i = 0; i < num_players; i++) 
+		clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(cards[c])) * -1);
+		for (int p = 0; p < num_players; p++) 
 		{
 			//If iterate to the player I am, let's continue
-			if(GetPlayerNum(players[i]) == player_num) 
+			cout << "GetPlayer: " << GetPlayerNum(players[p]) << " player num: " << player_num << endl;
+			if(GetPlayerNum(players[p]) == player_num) 
 			{
 				continue;
 			}
 
 			// Every other player cannot have my card
-			clause.push_back(GetPairNum(GetPlayerNum(players[i]), GetCardNum(cards[i])) * -1);
+			clause.push_back(GetPairNum(GetPlayerNum(players[p]), GetCardNum(cards[c])) * -1);
 
 		}
 		solver->AddClause(clause);

@@ -111,7 +111,7 @@ void ClueReasoner::AddInitialClauses()
 				else 
 				{
 					//Because player p has card c, player k cannot have card c
-					clause.push_back(GetPairNum(k,c * -1));
+					clause.push_back(GetPairNum(k,c) * -1);
 				}
 			}
 			solver->AddClause(clause);
@@ -127,7 +127,7 @@ void ClueReasoner::AddInitialClauses()
 	for (int i = 0; i < num_suspects; i++) 
 	{
 		//Add clause that one player card is in the case file location
-		sus_clause.push_back(GetPairNum(GetCardNum(suspects[i]), GetPlayerNum("cf")));
+		sus_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(suspects[i])));
 	}
 	solver->AddClause(sus_clause);
 
@@ -135,7 +135,7 @@ void ClueReasoner::AddInitialClauses()
 	for (int i = 0; i < num_weapons; i++) 
 	{
 		//Add clause that at least one weapon is in casefile location
-		weapon_clause.push_back(GetPairNum(GetCardNum(weapons[i]), GetPlayerNum("cf")));
+		weapon_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(weapons[i])));
 	}
 	solver->AddClause(weapon_clause);
 
@@ -143,7 +143,7 @@ void ClueReasoner::AddInitialClauses()
 	for (int i = 0; i < num_rooms; i++) 
 	{
 		//Add clause that at least one weapon is in casefile location
-		room_clause.push_back(GetPairNum(GetCardNum(rooms[i]), GetPlayerNum("cf")));
+		room_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(rooms[i])));
 	}
 	solver->AddClause(room_clause);
  
@@ -164,8 +164,8 @@ void ClueReasoner::AddInitialClauses()
 				continue;
 			}
 			//If suspect i, is in the casefile, then suspect k cannot be
-			sus_clause.push_back(GetPairNum(GetCardNum(suspects[i]), GetPlayerNum("cf")));
-			sus_clause.push_back(GetPairNum(GetCardNum(suspects[k]), GetPlayerNum("cf")));
+			sus_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(suspects[i])));
+			sus_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(suspects[k])) * -1);
 		}
 		solver->AddClause(sus_clause);
 	}
@@ -179,9 +179,9 @@ void ClueReasoner::AddInitialClauses()
 			{
 				continue;
 			}
-			//If suspect i, is in the casefile, then suspect k cannot be
-			weapon_clause.push_back(GetPairNum(GetCardNum(weapons[i]), GetPlayerNum("cf")));
-			weapon_clause.push_back(GetPairNum(GetCardNum(weapons[k]), GetPlayerNum("cf")));
+			//If weapon i, is in the casefile, then weapon k cannot be
+			weapon_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(weapons[i])));
+			weapon_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(weapons[k])) * -1);
 		}
 		solver->AddClause(weapon_clause);
 	}
@@ -195,9 +195,9 @@ void ClueReasoner::AddInitialClauses()
 			{
 				continue;
 			}
-			//If suspect i, is in the casefile, then suspect k cannot be
-			room_clause.push_back(GetPairNum(GetCardNum(rooms[i]), GetPlayerNum("cf")));
-			room_clause.push_back(GetPairNum(GetCardNum(rooms[k]), GetPlayerNum("cf")));
+			//If room i, is in the casefile, then room k cannot be
+			room_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(rooms[i])));
+			room_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(rooms[k])) * -1);
 		}
 		solver->AddClause(room_clause);
 	}
@@ -217,6 +217,29 @@ void ClueReasoner::Hand(string player, string cards[3])
 	// TO BE IMPLEMENTED AS AN EXERCISE
 
 	// Now that we know the player_number we can adding clauses
+	for (int i = 0; i < cards->size(); i++) 
+	{
+		Clause clause;
+		//My player has the card, so no one else can
+		clause.push_back(GetPairNum(player_num, GetCardNum(cards[i])));
+
+		//My card cannot be in the case file
+		clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(cards[i])) * -1);
+		for (int i = 0; i < num_players; i++) 
+		{
+			//If iterate to the player I am, let's continue
+			if(GetPlayerNum(players[i]) == player_num) 
+			{
+				continue;
+			}
+
+			// Every other player cannot have my card
+			clause.push_back(GetPairNum(GetPlayerNum(players[i]), GetCardNum(cards[i])) * -1);
+
+		}
+		solver->AddClause(clause);
+	}
+
 
 }
 

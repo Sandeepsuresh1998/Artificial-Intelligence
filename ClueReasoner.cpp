@@ -77,7 +77,7 @@ void ClueReasoner::AddInitialClauses()
 		
 	That is, a Literal (a propositional variable or its negation) is defined as a positive or a negative (meaning that it is in negated form, as in -p or -q) integer, and a Clause is defined as a vector of Literals.
 	
-	The function GetPairNum(p, c) returns the literal that corresponds to card c being at location p (either a player's hand or the case_file). 
+	The function GetPairNum(p, c) returns the literal that corresponds to card c being at location p (either a player's or the case_file). 
 	See ClueReasoner.h, lines 7-31 for a definition of the arrays and variables that you can use in your implementation. 
 	*/
 
@@ -93,20 +93,76 @@ void ClueReasoner::AddInitialClauses()
 	
 	// If a card is in one place, it cannot be in another place.
 	// TO BE IMPLEMENTED AS AN EXERCISE
+
+	for (int c = 0; c < num_cards; c++) // Iterate over all cards 
+	{
+		Clause clause;
+		for (int p = 0; p <= num_players; p++) //It's equal to the num players because of the case file? 
+		{
+			//Player p has card c
+			clause.push_back(GetPairNum(p,c));
+			for (int k = 0; k <= num_players; k++) 
+			{
+				//Make sure we are not dealing with the same player
+				if (k == p) 
+				{
+					continue;
+				}
+				else 
+				{
+					//Because player p has card c, player k cannot have card c
+					clause.push_back(GetPairNum(k,c * -1));
+				}
+			}
+			solver->AddClause(clause);
+		}
+	}
+
 	
 	// At least one card of each category is in the case file.
 	// TO BE IMPLEMENTED AS AN EXERCISE
 
+	//Iterate through all player cards
+	Clause sus_clause;
+	for (int i = 0; i < num_suspects; i++) 
+	{
+		//Add clause that one player card is in the case file location
+		clause.push_back(GetPairNum(GetCardNum(suspects[i]), GetCardNum('cf')));
+	}
+	solver->AddClause(sus_clause)
+
+	Clause weapon_clause;
+	for (int i = 0; i < num_weapons; i++) 
+	{
+		//Add clause that at least one weapon is in casefile location
+		weapon_clause.push_back(GetPairNum(GetCardNum(weapons[i]), GetCardNum('cf')));
+	}
+	solver->AddClause(weapon_clause)
+
+	Clause room_clause;
+	for (int i = 0; i < num_rooms; i++) 
+	{
+		//Add clause that at least one weapon is in casefile location
+		room_clause.push_back(GetPairNum(GetCardNum(rooms[i]), GetCardNum('cf')));
+	}
+	solver->AddClause(room_clause)
+ 
 	// No two cards in each category can both be in the case file.
 	// TO BE IMPLEMENTED AS AN EXERCISE
 }
 
 void ClueReasoner::Hand(string player, string cards[3])
 {
-	// GetPlayerNum returns the index of the player in the players array (not the suspects array). Remember that the players array is sorted wrt the order that the players play. Also note that, player_num (not to be confused with num_players) is a private variable of the ClueReasoner class that is initialized when this function is called.
+	// GetPlayerNum returns the index of the player in the players array (not the suspects array). 
+	// Remember that the players array is sorted wrt the order that the players play. 
+	// Also note that, player_num (not to be confused with num_players) is a private variable of 
+	// the ClueReasoner class that is initialized when this function is called.
 	player_num = GetPlayerNum(player);
 	
 	// TO BE IMPLEMENTED AS AN EXERCISE
+
+	// Now that we know the player_number we can adding clauses
+
 }
 
 void ClueReasoner::Suggest(string suggester, string card1, string card2, string card3, string refuter, string card_shown)

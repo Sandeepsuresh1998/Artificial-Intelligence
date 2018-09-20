@@ -250,70 +250,24 @@ void ClueReasoner::Suggest(string suggester, string card1, string card2, string 
 	// To check if refuter is NULL or card_shown is NULL, you should use if(refuter == "") or if(card_shown == ""), respectively.
 	
 	// TO BE IMPLEMENTED AS AN EXERCISE
-	if(card_shown != "") {
-		
-	} else {
-		
-	}
-
-	//If we are the ones suggesting
-	if(GetPlayerNum(suggester) == player_num) 
-	{
-		if(card_shown == "") {
-			cout << "We are suggester so we should see card" << endl;
-		}
-		//Immediately we know that refuter has card shown
-		Clause refuter_clause;
-		refuter_clause.push_back(GetPairNum(GetPlayerNum(refuter), GetCardNum(card_shown)));
-
-		//QUESTION: Does saying one person has a card automatically maek it so thta no other person has that card:
-		//If not: TODO below.
-		solver->AddClause(refuter_clause);
-
-		//Finally we know that all the players in between suggester and refuter don't have card1, card2, or card3
-		int current_num = GetPlayerNum(suggester); // Getting the suggester's number
-		current_num++; //Starting with the player after suggester
-		int refuter_num = GetPlayerNum(refuter);
-		while(current_num != refuter_num) {
-			//If suggeter num went to the case file then we need to reset to 0
-			if(current_num == num_players) {
-				current_num = 0;
-				continue;
-			} 
-
-			//Need to add multiple clauses to show the current player doesn't have card1, card2, or card3
-			Clause card1_clause;
-			Clause card2_clause;
-			Clause card3_clause;
-
-
-			//The current player doesn't have any of the cards
-			card1_clause.push_back(GetPairNum(current_num, GetCardNum(card1) * -1));
-			card2_clause.push_back(GetPairNum(current_num, GetCardNum(card2) * -1));
-			card3_clause.push_back(GetPairNum(current_num, GetCardNum(card3) * -1));
-
-
-			solver->AddClause(card1_clause);
-			solver->AddClause(card2_clause);
-			solver->AddClause(card3_clause);
-
-
-			//Iterate to the next player 
-			current_num++;
-		}
-
-	//We are not the ones suggesting 
-	} else {
+	if(refuter != "") {
+		cout << "mhm" << endl;
 		if(card_shown != "") {
-			cout << "We shouldn't be seeing this card?" << endl;
-		}
+			//Immediately we know that refuter has card shown
+			Clause refuter_clause;
+			refuter_clause.push_back(GetPairNum(GetPlayerNum(refuter), GetCardNum(card_shown)));
 
-		//Immediately we know that the refuter has at least one of the cards
-		Clause refuter_clause;
-		refuter_clause.push_back(GetPairNum(GetPlayerNum(refuter), GetCardNum(card1)));
-		refuter_clause.push_back(GetPairNum(GetPlayerNum(refuter), GetCardNum(card2)));
-		refuter_clause.push_back(GetPairNum(GetPlayerNum(refuter), GetCardNum(card3)));
-		solver->AddClause(refuter_clause);
+			//QUESTION: Does saying one person has a card automatically maek it so that no other person has that card?
+			//If not: TODO below.
+			solver->AddClause(refuter_clause);
+		} else {
+			//Immediately we know that the refuter has at least one of the cards
+			Clause refuter_clause;
+			refuter_clause.push_back(GetPairNum(GetPlayerNum(refuter), GetCardNum(card1)));
+			refuter_clause.push_back(GetPairNum(GetPlayerNum(refuter), GetCardNum(card2)));
+			refuter_clause.push_back(GetPairNum(GetPlayerNum(refuter), GetCardNum(card3)));
+			solver->AddClause(refuter_clause);
+		}
 
 		//Finally we know that all the players in between suggester and refuter don't have card1, card2, or card3
 		int current_num = GetPlayerNum(suggester); // Getting the suggester's number
@@ -331,6 +285,7 @@ void ClueReasoner::Suggest(string suggester, string card1, string card2, string 
 			Clause card2_clause;
 			Clause card3_clause;
 
+
 			//The current player doesn't have any of the cards
 			card1_clause.push_back(GetPairNum(current_num, GetCardNum(card1) * -1));
 			card2_clause.push_back(GetPairNum(current_num, GetCardNum(card2) * -1));
@@ -344,8 +299,26 @@ void ClueReasoner::Suggest(string suggester, string card1, string card2, string 
 			current_num++;
 		}
 
-	}
+	} else {
+		cout << "Made it" << endl;
+		//Iterate through all players and say that they don't have the cards
+		for (int i = 0; i < num_players; i++) {
+			if (i == GetPlayerNum(suggester)) 
+				continue;
 
+			Clause card1_clause;
+			Clause card2_clause;
+			Clause card3_clause;
+			card1_clause.push_back(GetPairNum(i, GetCardNum(card1) * -1));
+			card2_clause.push_back(GetPairNum(i, GetCardNum(card2) * -1));
+			card3_clause.push_back(GetPairNum(i, GetCardNum(card3) * -1));
+
+			solver->AddClause(card1_clause);
+			solver->AddClause(card2_clause);
+			solver->AddClause(card3_clause);
+		}
+	}
+	
 	
 }
 

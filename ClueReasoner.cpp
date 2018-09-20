@@ -221,11 +221,17 @@ void ClueReasoner::Hand(string player, string cards[3])
 		Clause clause;
 		//My player has the card, so no one else can
 		clause.push_back(GetPairNum(player_num, GetCardNum(cards[c])));
+		solver->AddClause(clause);
 
 		//My card cannot be in the case file
-		clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(cards[c])) * -1);
+		Clause case_file_clause;
+		case_file_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(cards[c])) * -1);
+		solver->AddClause(clause);
+
+		//Other players can't have my card
 		for (int p = 0; p < num_players; p++) 
 		{
+			Clause clause;
 			//If iterate to the player I am, let's continue
 			cout << "GetPlayer: " << GetPlayerNum(players[p]) << " player num: " << player_num << endl;
 			if(GetPlayerNum(players[p]) == player_num) 
@@ -235,9 +241,9 @@ void ClueReasoner::Hand(string player, string cards[3])
 
 			// Every other player cannot have my card
 			clause.push_back(GetPairNum(GetPlayerNum(players[p]), GetCardNum(cards[c])) * -1);
+			solver->AddClause(clause);
 
 		}
-		solver->AddClause(clause);
 	}
 
 

@@ -96,13 +96,11 @@ void ClueReasoner::AddInitialClauses()
 
 	for (int c = 0; c < num_cards; c++) // Iterate over all cards 
 	{
-		Clause clause;
 		for (int p = 0; p <= num_players; p++) //It's equal to the num players because of the case file? 
 		{
-			//Player p has card c
-			clause.push_back(GetPairNum(p,c));
 			for (int k = 0; k <= num_players; k++) 
 			{
+				Clause clause;
 				//Make sure we are not dealing with the same player
 				if (k == p) 
 				{
@@ -111,10 +109,11 @@ void ClueReasoner::AddInitialClauses()
 				else 
 				{
 					//Because player p has card c, player k cannot have card c
+					clause.push_back(GetPairNum(p,c) * -1);
 					clause.push_back(GetPairNum(k,c) * -1);
 				}
+				solver->AddClause(clause);
 			}
-			solver->AddClause(clause);
 		}
 	}
 
@@ -157,49 +156,54 @@ void ClueReasoner::AddInitialClauses()
 	// No two cards for suspect category
 	for (int i = 0; i < num_suspects; i++) 
 	{
-		Clause sus_clause;
+		
 		for (int k = 0; k < num_suspects; k++) 
-		{
+		{	
+			Clause sus_clause;
 			if(i == k){
 				continue;
 			}
 			//If suspect i, is in the casefile, then suspect k cannot be
-			sus_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(suspects[i])));
+			sus_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(suspects[i])) * -1);
 			sus_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(suspects[k])) * -1);
+			solver->AddClause(sus_clause);
 		}
-		solver->AddClause(sus_clause);
+		
 	}
 
 	for (int i = 0; i < num_weapons; i++) 
 	{
-		Clause weapon_clause;
 		for (int k = 0; k < num_weapons; k++) 
 		{
+			Clause weapon_clause;
 			if(i == k)
 			{
 				continue;
 			}
 			//If weapon i, is in the casefile, then weapon k cannot be
-			weapon_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(weapons[i])));
+			weapon_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(weapons[i])) * -1);
 			weapon_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(weapons[k])) * -1);
+			solver->AddClause(weapon_clause);
 		}
-		solver->AddClause(weapon_clause);
+		
 	}
 
 	for (int i = 0; i < num_rooms; i++) 
 	{
-		Clause room_clause;
+		
 		for (int k = 0; k < num_rooms; k++) 
 		{
+			Clause room_clause;
 			if(i == k) 
 			{
 				continue;
 			}
 			//If room i, is in the casefile, then room k cannot be
-			room_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(rooms[i])));
+			room_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(rooms[i])) * -1);
 			room_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(rooms[k])) * -1);
+			solver->AddClause(room_clause);
 		}
-		solver->AddClause(room_clause);
+		
 	}
 
 
@@ -215,56 +219,30 @@ void ClueReasoner::Hand(string player, string cards[3])
 	player_num = GetPlayerNum(player);
 	// TO BE IMPLEMENTED AS AN EXERCISE
 
-	// Now that we know the player_number we can adding clauses
-	for (int c = 0; c < 3; c++) 
-	{
-		Clause clause;
-		//My player has the card, so no one else can
-		clause.push_back(GetPairNum(player_num, GetCardNum(cards[c])));
+	for (int i = 0; i < 3; i++) {
+		Clause clause; 
+		clause.push_back(GetPairNum(player_num, GetCardNum(cards[i])));
 		solver->AddClause(clause);
-
-		//My card cannot be in the case file
-		Clause case_file_clause;
-		case_file_clause.push_back(GetPairNum(GetPlayerNum("cf"), GetCardNum(cards[c])) * -1);
-		solver->AddClause(clause);
-
-		//Other players can't have my card
-		for (int p = 0; p < num_players; p++) 
-		{
-			Clause clause;
-			//If iterate to the player I am, let's continue
-			cout << "GetPlayer: " << GetPlayerNum(players[p]) << " player num: " << player_num << endl;
-			if(GetPlayerNum(players[p]) == player_num) 
-			{
-				continue;
-			}
-
-			// Every other player cannot have my card
-			clause.push_back(GetPairNum(GetPlayerNum(players[p]), GetCardNum(cards[c])) * -1);
-			solver->AddClause(clause);
-
-		}
 	}
-
-
 }
 
 void ClueReasoner::Suggest(string suggester, string card1, string card2, string card3, string refuter, string card_shown)
 {
+	return;
 	// // Note that in the Java implementation, the refuter and the card_shown can be NULL. 
 	// // In this C++ implementation, NULL is translated to be the empty string "".
 	// // To check if refuter is NULL or card_shown is NULL, you should use if(refuter == "") or if(card_shown == ""), respectively.
 	
 	// TO BE IMPLEMENTED AS AN EXERCISE
+
+	//If we have a refuter
 	if(refuter != "") {
-		cout << "LOL" << endl;
+	
+		//If we know the card shown
 		if(card_shown != "") {
 			//Immediately we know that refuter has card shown
 			Clause refuter_clause;
 			refuter_clause.push_back(GetPairNum(GetPlayerNum(refuter), GetCardNum(card_shown)));
-
-			//QUESTION: Does saying one person has a card automatically maek it so that no other person has that card?
-			//If not: TODO below.
 			solver->AddClause(refuter_clause);
 		} else {
 			//Immediately we know that the refuter has at least one of the cards

@@ -228,7 +228,6 @@ void ClueReasoner::Hand(string player, string cards[3])
 
 void ClueReasoner::Suggest(string suggester, string card1, string card2, string card3, string refuter, string card_shown)
 {
-	return;
 	// // Note that in the Java implementation, the refuter and the card_shown can be NULL. 
 	// // In this C++ implementation, NULL is translated to be the empty string "".
 	// // To check if refuter is NULL or card_shown is NULL, you should use if(refuter == "") or if(card_shown == ""), respectively.
@@ -255,54 +254,63 @@ void ClueReasoner::Suggest(string suggester, string card1, string card2, string 
 
 		// NOTE: This is the section that is screwing things up
 		//Finally we know that all the players in between suggester and refuter don't have card1, card2, or card3
-		// int current_num = GetPlayerNum(suggester); // Getting the suggester's number
-		// current_num++; //Starting with the player after suggester
-		// int refuter_num = GetPlayerNum(refuter);
-		// while(current_num != refuter_num) {
-		// 	//If suggeter num went to the case file then we need to reset to 0
-		// 	if(current_num == num_players) {
-		// 		current_num = 0;
-		// 		continue;
-		// 	} 
 
-		// 	//Need to add multiple clauses to show the current player doesn't have card1, card2, or card3
-		// 	Clause card1_clause;
-		// 	Clause card2_clause;
-		// 	Clause card3_clause;
+		cout << GetPlayerNum(suggester) << endl;
+		cout << GetPlayerNum(refuter) << endl;
+
+		int current_player = GetPlayerNum(suggester);
+		int refuter_num = GetPlayerNum(refuter);
 
 
-		// 	//The current player doesn't have any of the cards
-		// 	card1_clause.push_back(GetPairNum(current_num, GetCardNum(card1) * -1));
-		// 	card2_clause.push_back(GetPairNum(current_num, GetCardNum(card2) * -1));
-		// 	card3_clause.push_back(GetPairNum(current_num, GetCardNum(card3) * -1));
+		// while(current_player != refuter_num) {
 
-		// 	solver->AddClause(card1_clause);
-		// 	solver->AddClause(card2_clause);
-		// 	solver->AddClause(card3_clause);
+		// 	if(current_player == num_players) {
+		// 		current_player = 0;
+		// 	} else {
 
-		// 	//Iterate to the next player 
-		// 	current_num++;
-		// } //End of section that is screwing things up
+
+		// 		Clause clause1; 
+		// 		clause1.push_back(GetPairNum(current_player, GetCardNum(card1)) * -1);
+		// 		solver->AddClause(clause1);
+		// 		cout << "Clause 1" << endl;
+
+		// 		Clause clause2; 
+		// 		clause2.push_back(GetPairNum(current_player, GetCardNum(card2)) * -1);
+		// 		solver->AddClause(clause2);
+
+		// 		Clause clause3; 
+		// 		clause3.push_back(GetPairNum(current_player, GetCardNum(card3)) * -1);
+		// 		solver->AddClause(clause3);
+
+		// 		//Iterate to the next player 
+		// 		current_player++;
+		// 	}
+		// }
 
 	} else {
-		// cout << "Made it" << endl;
-		// //Iterate through all players and say that they don't have the cards
-		// for (int i = 0; i < num_players; i++) {
-		// 	if (i == GetPlayerNum(suggester)) 
-		// 		continue;
 
-		// 	Clause card1_clause;
-		// 	Clause card2_clause;
-		// 	Clause card3_clause;
+		//Iterate through all players and say that they don't have the cards
+		for (int i = 0; i < num_players; i++) {
 
-		// 	card1_clause.push_back(GetPairNum(i, GetCardNum(card1) * -1));
-		// 	card2_clause.push_back(GetPairNum(i, GetCardNum(card2) * -1));
-		// 	card3_clause.push_back(GetPairNum(i, GetCardNum(card3) * -1));
+			//We can't say suggester doesn't have the cards suggested
+			if (i == GetPlayerNum(suggester)) {
+				continue;
+			}
+			cout << i << endl;
 
-		// 	solver->AddClause(card1_clause);
-		// 	solver->AddClause(card2_clause);
-		// 	solver->AddClause(card3_clause);
+			Clause card1_clause;
+			Clause card2_clause;
+			Clause card3_clause;
+
+			card1_clause.push_back(GetPairNum(i, GetCardNum(card1)) * -1);
+			card2_clause.push_back(GetPairNum(i, GetCardNum(card2)) * -1);
+			card3_clause.push_back(GetPairNum(i, GetCardNum(card3)) * -1);
+
+			solver->AddClause(card1_clause);
+			solver->AddClause(card2_clause);
+			solver->AddClause(card3_clause);
 		
+		}
 	}
 	
 	

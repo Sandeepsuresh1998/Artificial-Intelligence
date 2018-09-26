@@ -90,6 +90,7 @@ void ClueReasoner::AddInitialClauses()
 		
 		solver->AddClause(clause);
 	}
+//----------------------------------------------------------------------------------------------
 	
 	// If a card is in one place, it cannot be in another place.
 	// TO BE IMPLEMENTED AS AN EXERCISE
@@ -116,7 +117,7 @@ void ClueReasoner::AddInitialClauses()
 			}
 		}
 	}
-
+//----------------------------------------------------------------------------------------------
 	
 	// At least one card of each category is in the case file.
 	// TO BE IMPLEMENTED AS AN EXERCISE
@@ -219,6 +220,7 @@ void ClueReasoner::Hand(string player, string cards[3])
 	player_num = GetPlayerNum(player);
 	// TO BE IMPLEMENTED AS AN EXERCISE
 
+	//Adding the fact that my player has the cards to the knowledge base
 	for (int i = 0; i < 3; i++) {
 		Clause clause; 
 		clause.push_back(GetPairNum(player_num, GetCardNum(cards[i])));
@@ -251,41 +253,6 @@ void ClueReasoner::Suggest(string suggester, string card1, string card2, string 
 			refuter_clause.push_back(GetPairNum(GetPlayerNum(refuter), GetCardNum(card3)));
 			solver->AddClause(refuter_clause);
 		}
-
-		// NOTE: This is the section that is screwing things up
-		//Finally we know that all the players in between suggester and refuter don't have card1, card2, or card3
-
-		cout << GetPlayerNum(suggester) << endl;
-		cout << GetPlayerNum(refuter) << endl;
-
-		int current_player = GetPlayerNum(suggester);
-		int refuter_num = GetPlayerNum(refuter);
-
-
-		// while(current_player != refuter_num) {
-
-		// 	if(current_player == num_players) {
-		// 		current_player = 0;
-		// 	} else {
-
-
-		// 		Clause clause1; 
-		// 		clause1.push_back(GetPairNum(current_player, GetCardNum(card1)) * -1);
-		// 		solver->AddClause(clause1);
-		// 		cout << "Clause 1" << endl;
-
-		// 		Clause clause2; 
-		// 		clause2.push_back(GetPairNum(current_player, GetCardNum(card2)) * -1);
-		// 		solver->AddClause(clause2);
-
-		// 		Clause clause3; 
-		// 		clause3.push_back(GetPairNum(current_player, GetCardNum(card3)) * -1);
-		// 		solver->AddClause(clause3);
-
-		// 		//Iterate to the next player 
-		// 		current_player++;
-		// 	}
-		// }
 
 	} else {
 
